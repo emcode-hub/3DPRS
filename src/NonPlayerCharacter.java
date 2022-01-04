@@ -20,4 +20,31 @@ public class NonPlayerCharacter extends Character{
 		this.challengeRating = challengeRating;
 	}
 
+	@Override
+	public int attack(int targetAC) {
+		// TODO Auto-generated method stub
+		return 1;
+	}
+
+	
+	//we wouldn't know these until the subclass of goblin, for example.
+	@Override
+	int getAttackMod() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	int getAttacksPerTurn() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	int getDamageModifiers() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
 }

@@ -22,31 +22,33 @@ public class Barbarian extends Character{
 		}
 	}
 
-	public int attack(Character target) {
-		int totalDamage=0;
-		int numAttacks= this.getAttacksPerTurn();
+//	public int attack(int targetAC) {
+//		int totalDamage=0;
+//		int numAttacks= this.getAttacksPerTurn();
+//
+//		while(numAttacks>0) {
+//			//roll to hit
+//			int diceRoll = Roller.RollOneD(20);
+//			int totalHitRoll = diceRoll + this.getProficiencyBonus() + this.getStrMod();
+//			
+//			//if hit, calculate damage. else return 0 for a miss
+//			if(targetAC<=totalHitRoll) {
+//				totalDamage+=this.getWeaponDamage();
+//				//get damage modifiers
+//				totalDamage+=this.getDamageModifiers();
+//			}
+//			numAttacks--;
+//		}
+//		return totalDamage;
+//	}
 
-		while(numAttacks>0) {
-			//roll to hit
-			int diceRoll = Roller.RollOneD(20);
-			int totalHitRoll = diceRoll + this.getProficiencyBonus() + this.getStrMod();
-			
-			//if hit, calculate damage. else return 0 for a miss
-			if(target.getArmorClass()<=totalHitRoll) {
-				totalDamage+=this.getWeaponDamage();
-				//get damage modifiers
-				totalDamage+=this.getDamageModifiers();
-			}
-			numAttacks--;
-		}
-		return totalDamage;
-	}
-
-	private int getAttacksPerTurn() {
+	@Override
+	int getAttacksPerTurn() {
 		return this.getLevel() < 5? 1:2;
 	}
 
-	private int getDamageModifiers() {
+	@Override
+	int getDamageModifiers() {
 		//a barbarian would add his strengthMod and get +2 if raging
 		int totalDamageModifier = 0;
 
@@ -58,16 +60,14 @@ public class Barbarian extends Character{
 		return totalDamageModifier;
 	}
 
-	private int getWeaponDamage() {
-		int weaponDamage=0;
-		//if no weapon it would be an unarmed strike, so still deals damage
-		weaponDamage+=weapon.rollDamage();
-		return weaponDamage;
-	}
-
 	@Override
 	public int getProficiencyBonus() {
 		return (isProficientInWeapon() ? ((this.getLevel()-1)/4+2) : 0);
+	}
+
+	@Override
+	public int getAttackMod() {
+		return this.getStrMod();
 	}
 
 	private boolean isProficientInWeapon() {
@@ -98,14 +98,5 @@ public class Barbarian extends Character{
 		else {
 			this.level = 1;
 		}
-	}
-
-	public Weapon getWeapon() {
-		return weapon;
-	}
-
-	public void setWeapon(Weapon weapon) {
-		System.out.println("Setting weapon as "+weapon.getWeaponName());
-		this.weapon = weapon;
 	}
 }

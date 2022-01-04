@@ -1,6 +1,8 @@
 
 public abstract class Character extends Roller{
 	private int strength, dexterity, constitution, intellect, wisdom, charisma, armorClass, hitPoints;
+	boolean advantage, disadvantage = false;
+	private Weapon weapon;
 
 	public Character(int str, int dex, int con, int intel, int wis, int cha, int ac, int hp) {
 		this.setStrength(str);
@@ -13,8 +15,56 @@ public abstract class Character extends Roller{
 		this.setHitPoints(hp);
 	}
 	
-	//Player Characters and NPCs calculate proficiency bonus differently, so we leave that burden to the subclass
+	//Player Characters and NPCs calculate proficiency bonus differently, so we leave that burden to the subclass. Same for calculating attackMod
 	public abstract int getProficiencyBonus();
+	abstract int getAttackMod();
+	abstract int getAttacksPerTurn();
+	abstract int getDamageModifiers();
+	
+	public int attack(int targetAC) {
+		int totalDamage=0;
+		int numAttacks= this.getAttacksPerTurn();
+
+		while(numAttacks>0) {
+			//roll to hit
+			int diceRoll = 0;
+			if(this.hasAdvantage()) {
+				diceRoll = RollAdvantageOneD(20);
+			}
+			else if (this.hasDisadvantage()) {
+				diceRoll = RollDisadvantageOneD(20);
+			}
+			else {
+				diceRoll = RollOneD(20);
+			}
+			int totalHitRoll = diceRoll + this.getProficiencyBonus() + this.getAttackMod();
+			
+			//if hit, calculate damage. else return 0 for a miss
+			if(targetAC<=totalHitRoll) {
+				totalDamage+=this.getWeaponDamage();
+				//get damage modifiers
+				totalDamage+=this.getDamageModifiers();
+			}
+			numAttacks--;
+		}
+		return totalDamage;
+	}
+	
+	public Weapon getWeapon() {
+		return weapon;
+	}
+
+	public void setWeapon(Weapon weapon) {
+		System.out.println("Setting weapon as "+weapon.getWeaponName());
+		this.weapon = weapon;
+	}
+
+	private int getWeaponDamage() {//this should probably be in weapon, not here
+		int weaponDamage=0;
+		//if no weapon it would be an unarmed strike, so still deals damage
+		weaponDamage+=weapon.rollDamage();
+		return weaponDamage;
+	}
 	
 	public int getStrength() {
 		return strength;
@@ -106,5 +156,34 @@ public abstract class Character extends Roller{
 
 	public void setHitPoints(int hitPoints) {
 		this.hitPoints = hitPoints;
+	}
+	
+
+	public boolean hasAdvantage() {
+		return advantage;
+	}
+
+	public void setAdvantage(boolean advantage) {
+		if(this.hasDisadvantage() && advantage == true) {
+			this.advantage = false;
+			this.disadvantage = false;
+		}
+		else{
+			this.advantage = advantage;
+		}
+	}
+
+	public boolean hasDisadvantage() {
+		return disadvantage;
+	}
+
+	public void setDisadvantage(boolean disadvantage) {
+		if(this.hasAdvantage() && disadvantage==true) {
+			this.advantage = false;
+			this.disadvantage = false;
+		}
+		else{
+			this.disadvantage = disadvantage;
+		}
 	}
 }
